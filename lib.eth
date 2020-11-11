@@ -13,6 +13,28 @@ let balance color a x b =
   else (color, a, x, b)
 
 let pub impl { cmp } =
+{.help|
+= RBTree.impl
+
+== SYNOPSIS
+
+  RBTree.impl { cmp } -> { get, insert }
+
+== DESCRIPTION
+Create instance of an interface implementing a red-black tree.
+
+=== ARGUMENTS
+* _cmp_: User supplied binary function to compare keys:
+** `cmp x y < 0` => `x < y`
+** `cmp x y = 0` => `x = y`
+** `cmp x y > 0` => `x > y`
+
+== RETURN VALUE
+- _get_: `<key> <tree> -> <val>`. +
+  Raises `Failure` if there is not entry with given key in a tree.
+- _insert_: `(<key>, <val>) <tree> -> <tree>`
+  
+|.help}
   let rec get k t =
     if let (_, a, (k', v), b) = t then
       let test = cmp k k'
