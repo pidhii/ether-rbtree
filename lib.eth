@@ -1,0 +1,37 @@
+
+let balance color a x b =
+  if color is B then
+    if let (R, (R, aaa, aax, aab), ax, ab) = a then
+      (R, (B, aaa, aax, aab), ax, (B, ab, x, b))
+    else if let (R, aa, ax, (R, aba, abx, abb)) = a then
+      (R, (B, aa, ax, aba), abx, (B, abb, x, b))
+    else if let (R, (R, baa, bax, bab), bx, bb) = b then
+      (R, (B, a, x, baa), bax, (B, bab, bx, bb))
+    else if let (R, ba, bx, (R, bba, bbx, bbb)) = b then
+      (R, (B, a, x, ba), bx, (B, bba, bbx, bbb))
+    else (color, a, x, b)
+  else (color, a, x, b)
+
+let pub impl { cmp } =
+  let rec get k t =
+    if let (_, a, (k', v), b) = t then
+      let test = cmp k k'
+      if test < 0 then get k a
+      else if test > 0 then get k b
+      else v
+    else
+      raise Failure
+
+  let insert (k, v as x) t =
+    let rec ins t =
+      if let (color, a, (k', _ as y), b) = t then
+        let test =  cmp k k'
+        if test < 0 then balance color (ins a) y b
+        else if test > 0 then balance color a y (ins b)
+        else (color, a, v, b)
+      else (R, nil, x, nil)
+    let (_, a, x, b) = ins t
+    (B, a, x, b)
+
+  { get, insert }
+
