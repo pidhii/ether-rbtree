@@ -13,12 +13,12 @@ module Detail =
       else (color, a, x, b)
     else (color, a, x, b)
 
-let pub to_list t =
-  let rec collect t acc =
-    if let (_, a, x, b) = t then
-      x :: (acc |> collect a |> collect b)
-    else acc
-  collect t []
+  let pub to_list t =
+    let rec collect t acc =
+      if let (_, a, x, b) = t then
+        x :: (acc |> collect a |> collect b)
+      else acc
+    collect t []
 
 module Set =
   open Detail
@@ -29,7 +29,7 @@ module Set =
 
 == SYNOPSIS
 
-  RBTree.impl { cmp } -> { get, insert }
+  RBTree.impl { cmp } -> { get, insert, to_list, empty }
 
 == DESCRIPTION
 Create instance of an interface implementing a red-black tree.
@@ -41,20 +41,22 @@ Create instance of an interface implementing a red-black tree.
 ** `cmp x y > 0` => `x > y`
 
 == RETURN VALUE
-- _get_: `<key> <tree> -> <val>`. +
+- _get_: `<tree> <key> -> <val>`. +
   Raises `Failure` if there is not entry with given key in a tree.
-- _insert_: `(<key>, <val>) <tree> -> <tree>`
+- _insert_: `<tree> (<key>, <val>) -> <tree>`
+- _to_list_: `<tree> -> [(<key>, <val>), ...]`
+- _empty_: `<tree>`
   |.help}
-    let rec get x t =
+    let rec get t x =
       if let (_, a, y, b) = t then
         let test = cmp x y
-        if test < 0 then get x a
-        else if test > 0 then get x b
+        if test < 0 then get a x
+        else if test > 0 then get b x
         else y
       else
         raise Failure
 
-    let insert x t =
+    let insert t x =
       let rec ins t =
         if let (color, a, y, b) = t then
           let test =  cmp x y
@@ -65,7 +67,7 @@ Create instance of an interface implementing a red-black tree.
       let (_, a, x, b) = ins t
       (B, a, x, b)
 
-    { get, insert }
+    { get, insert, to_list, empty = nil }
 
 
 module Map =
@@ -77,7 +79,7 @@ module Map =
 
 == SYNOPSIS
 
-  RBTree.Map.impl { cmp } -> { get, insert }
+  RBTree.Map.impl { cmp } -> { get, insert, to_list, empty }
 
 == DESCRIPTION
 Create instance of an interface implementing a red-black tree.
@@ -89,20 +91,22 @@ Create instance of an interface implementing a red-black tree.
 ** `cmp x y > 0` => `x > y`
 
 == RETURN VALUE
-- _get_: `<key> <tree> -> <val>`. +
+- _get_: `<tree> <key> -> <val>`. +
   Raises `Failure` if there is not entry with given key in a tree.
-- _insert_: `(<key>, <val>) <tree> -> <tree>`
+- _insert_: `<tree> (<key>, <val>) -> <tree>`
+- _to_list_: `<tree> -> [(<key>, <val>), ...]`
+- _empty_: `<tree>`
   |.help}
-    let rec get k t =
+    let rec get t k =
       if let (_, a, (k', v'), b) = t then
         let test = cmp k k'
-        if test < 0 then get k a
-        else if test > 0 then get k b
+        if test < 0 then get a k
+        else if test > 0 then get b k
         else v'
       else
         raise Failure
 
-    let insert (k, _ as x) t =
+    let insert t (k, _ as x) =
       let rec ins t =
         if let (color, a, (k', _ as y), b) = t then
           let test =  cmp k k'
@@ -113,6 +117,6 @@ Create instance of an interface implementing a red-black tree.
       let (_, a, x, b) = ins t
       (B, a, x, b)
 
-    { get, insert }
+    { get, insert, to_list, empty = nil }
 
 
