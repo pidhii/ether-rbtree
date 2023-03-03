@@ -63,7 +63,15 @@ Create instance of an interface implementing a red-black tree.
     let (_, a, x, b) = ins t
     (`black, a, x, b)
 
-  { get, insert, to_list, empty = nil }
+  object {
+    name = "rbtree-set",
+    base = { t = nil },
+    methods = {
+      get = fn {t} x -> get t x,
+      insert = fn self x -> {self with t = insert self.t x},
+      list = fn {t} -> to_list t,
+    }
+  }
 
 
 let pub impl_map { cmp } =
@@ -110,5 +118,14 @@ Create instance of an interface implementing a red-black tree.
     let (_, a, x, b) = ins t
     (`black, a, x, b)
 
-  { get, insert, to_list, empty = nil }
+  object {
+    name = "rbtree-map",
+    base = { t = nil },
+    methods = {
+      get = fn {t} x -> get t x,
+      insert = fn self x -> {self with t = insert self.t x},
+      list = fn {t} -> to_list t,
+    }
+  }
+
 
