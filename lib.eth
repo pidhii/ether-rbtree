@@ -20,29 +20,6 @@ let to_list t =
   collect t []
 
 let pub impl_set { cmp } =
-{.help|
-= RBTree.Set.impl
-
-== SYNOPSIS
-
-  RBTree.impl { cmp } -> { get, insert, to_list, empty }
-
-== DESCRIPTION
-Create instance of an interface implementing a red-black tree.
-
-=== ARGUMENTS
-* _cmp_: User supplied binary function to compare values:
-** `cmp x y < 0` => `x < y`
-** `cmp x y = 0` => `x = y`
-** `cmp x y > 0` => `x > y`
-
-== RETURN VALUE
-- _get_: `<tree> <key> -> <val>`. +
-  Raises `Failure` if there is not entry with given key in a tree.
-- _insert_: `<tree> (<key>, <val>) -> <tree>`
-- _to_list_: `<tree> -> [(<key>, <val>), ...]`
-- _empty_: `<tree>`
-|.help}
   let rec get t x =
     if let (_, a, y, b) = t then
       let test = cmp x y
@@ -75,29 +52,6 @@ Create instance of an interface implementing a red-black tree.
 
 
 let pub impl_map { cmp } =
-{.help|
-= RBTree.impl
-
-== SYNOPSIS
-
-  RBTree.Map.impl { cmp } -> { get, insert, to_list, empty }
-
-== DESCRIPTION
-Create instance of an interface implementing a red-black tree.
-
-=== ARGUMENTS
-* _cmp_: User supplied binary function to compare keys:
-** `cmp x y < 0` => `x < y`
-** `cmp x y = 0` => `x = y`
-** `cmp x y > 0` => `x > y`
-
-== RETURN VALUE
-- _get_: `<tree> <key> -> <val>`. +
-  Raises `Failure` if there is not entry with given key in a tree.
-- _insert_: `<tree> (<key>, <val>) -> <tree>`
-- _to_list_: `<tree> -> [(<key>, <val>), ...]`
-- _empty_: `<tree>`
-|.help}
   let rec get t k =
     if let (_, a, (k', v'), b) = t then
       let test = cmp k k'
