@@ -1,85 +1,99 @@
 
-let balance color a x b =
+let balance(color, a, x, b) {
   if color is `black then
-    if let (`red, (`red, aaa, aax, aab), ax, ab) = a then
-      (`red, (`black, aaa, aax, aab), ax, (`black, ab, x, b))
-    else if let (`red, aa, ax, (`red, aba, abx, abb)) = a then
-      (`red, (`black, aa, ax, aba), abx, (`black, abb, x, b))
-    else if let (`red, (`red, baa, bax, bab), bx, bb) = b then
-      (`red, (`black, a, x, baa), bax, (`black, bab, bx, bb))
-    else if let (`red, ba, bx, (`red, bba, bbx, bbb)) = b then
-      (`red, (`black, a, x, ba), bx, (`black, bba, bbx, bbb))
-    else (color, a, x, b)
-  else (color, a, x, b)
+    if let #(`red, #(`red, aaa, aax, aab), ax, ab) = a then
+      #(`red, #(`black, aaa, aax, aab), ax, #(`black, ab, x, b))
+    else if let #(`red, aa, ax, #(`red, aba, abx, abb)) = a then
+      #(`red, #(`black, aa, ax, aba), abx, #(`black, abb, x, b))
+    else if let #(`red, #(`red, baa, bax, bab), bx, bb) = b then
+      #(`red, #(`black, a, x, baa), bax, #(`black, bab, bx, bb))
+    else if let #(`red, ba, bx, #(`red, bba, bbx, bbb)) = b then
+      #(`red, #(`black, a, x, ba), bx, #(`black, bba, bbx, bbb))
+    else #(color, a, x, b)
+  else #(color, a, x, b)
+}
 
-let to_list t =
-  let rec collect t acc =
-    if let (_, a, x, b) = t then
-      x :: (acc |> collect a |> collect b)
+let to_list(t) {
+  let rec collect(t, acc) {
+    if let #(_, a, x, b) = t then
+      x :: {acc |> collect(a) |> collect(b)}
     else acc
-  collect t []
+  }
+  collect(t, [])
+}
 
-let pub impl_set { cmp } =
-  let rec get t x =
-    if let (_, a, y, b) = t then
-      let test = cmp x y
-      if test < 0 then get a x
-      else if test > 0 then get b x
+let pub impl_set(#{ cmp }) {
+  let rec get(t, x) {
+    if let #(_, a, y, b) = t then {
+      let test = cmp(x, y)
+      if test < 0 then get(a, x)
+      else if test > 0 then get(b, x)
       else y
-    else
-      raise `failure
-
-  let insert t x =
-    let rec ins t =
-      if let (color, a, y, b) = t then
-        let test =  cmp x y
-        if test < 0 then balance color (ins a) y b
-        else if test > 0 then balance color a y (ins b)
-        else (color, a, x, b)
-      else (`red, nil, x, nil)
-    let (_, a, x, b) = ins t
-    (`black, a, x, b)
-
-  object {
-    name = "rbtree-set",
-    base = { t = nil },
-    methods = {
-      get = fn {t} x -> get t x,
-      insert = fn self x -> {self with t = insert self.t x},
-      list = fn {t} -> to_list t,
     }
+    else
+      raise(`failure)
   }
 
+  let insert(t, x) {
+    let rec ins(t) {
+      if let #(color, a, y, b) = t then {
+        let test =  cmp(x, y)
+        if test < 0 then balance(color, ins(a), y, b)
+        else if test > 0 then balance(color, a, y, ins(b))
+        else #(color, a, x, b)
+      }
+      else #(`red, nil, x, nil)
+    }
+    let #(_, a, x, b) = ins(t)
+    #(`black, a, x, b)
+  }
 
-let pub impl_map { cmp } =
-  let rec get t k =
-    if let (_, a, (k', v'), b) = t then
-      let test = cmp k k'
-      if test < 0 then get a k
-      else if test > 0 then get b k
+  object(#{
+    name = "rbtree-set"
+    base = #{ t = nil }
+    methods = #{
+      get(self, x) { get(self.t, x) }
+      insert(self, x) { #{self with t = insert(self.t, x)} }
+      list(self) { to_list(self.t) }
+    }
+  })
+}
+
+
+let pub impl_map(#{ cmp }) {
+  let rec get(t, k) {
+    if let #(_, a, #(k', v'), b) = t then {
+      let test = cmp(k, k')
+      if test < 0 then get(a, k)
+      else if test > 0 then get(b, k)
       else v'
-    else
-      raise `failure
-
-  let insert t (k, _ as x) =
-    let rec ins t =
-      if let (color, a, (k', _ as y), b) = t then
-        let test =  cmp k k'
-        if test < 0 then balance color (ins a) y b
-        else if test > 0 then balance color a y (ins b)
-        else (color, a, x, b)
-      else (`red, nil, x, nil)
-    let (_, a, x, b) = ins t
-    (`black, a, x, b)
-
-  object {
-    name = "rbtree-map",
-    base = { t = nil },
-    methods = {
-      get = fn {t} x -> get t x,
-      insert = fn self x -> {self with t = insert self.t x},
-      list = fn {t} -> to_list t,
     }
+    else
+      raise(`failure)
   }
 
+  let insert(t, #(k, _) as x) {
+    let rec ins(t) {
+      if let #(color, a, #(k', _) as y, b) = t then {
+        let test =  cmp(k, k')
+        if test < 0 then balance(color, ins(a), y, b)
+        else if test > 0 then balance(color, a, y, ins(b))
+        else #(color, a, x, b)
+      }
+      else #(`red, nil, x, nil)
+    }
+    let #(_, a, x, b) = ins(t)
+    #(`black, a, x, b)
+  }
+
+  object(#{
+    name = "rbtree-map"
+    base = #{ t = nil }
+    methods = #{
+      get(self, x) { get(self.t, x) }
+      insert(self, x) { #{self with t = insert(self.t, x) } }
+      list(self) { to_list(self.t) }
+    }
+  })
+}
 
